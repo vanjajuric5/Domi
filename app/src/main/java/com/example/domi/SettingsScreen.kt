@@ -1,5 +1,7 @@
 package com.example.domi
 
+import android.app.Activity
+import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -10,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,6 +26,7 @@ fun SettingsScreen(
     onNightModeChange: (Boolean) -> Unit
 ) {
     var notificationsEnabled by remember { mutableStateOf(true) }
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -69,9 +73,9 @@ fun SettingsScreen(
             )
 
             SettingsClickableItem(
-                title = "Česta pitanja (QnA)",
+                title = "Česta pitanja (FAQ)",
                 iconResId = R.drawable.ic_qna,
-                onClick = { /* TODO: Navigate to QnA */ }
+                onClick = { /* TODO: Navigate to FAQ */ }
             )
 
             SettingsClickableItem(
@@ -79,6 +83,23 @@ fun SettingsScreen(
                 iconResId = R.drawable.ic_info,
                 onClick = { /* TODO: Navigate to About Us */ }
             )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Logout Button
+            Button(
+                onClick = {
+                    val intent = Intent(context, LoginActivity::class.java)
+                    context.startActivity(intent)
+                    (context as? Activity)?.finish()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+            ) {
+                Text("Odjavi se")
+            }
         }
     }
 }

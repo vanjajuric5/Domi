@@ -1,11 +1,11 @@
 package com.example.domi
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -25,7 +26,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.domi.ui.theme.DomiTheme
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,16 +43,17 @@ class LoginActivity : ComponentActivity() {
 fun LoginScreen() {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     Box(
         modifier = Modifier.fillMaxSize()
-
     ) {
         Image(
             painter = painterResource(id = R.drawable.paw_background),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
+            alpha = 0.4f // Smanjen opacity pozadine
         )
 
         Column(
@@ -61,7 +62,6 @@ fun LoginScreen() {
                 .padding(26.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
-
         ) {
             Text(
                 text = "Prijava",
@@ -75,10 +75,11 @@ fun LoginScreen() {
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email", color = Color.Black, fontWeight =FontWeight.Bold) },
+                label = { Text("Email", color = Color.Black, fontWeight = FontWeight.Bold) },
                 leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = Color.Black) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
+                singleLine = true, // Onemogućuje povećavanje pri stiskanju enter
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black,
@@ -93,10 +94,11 @@ fun LoginScreen() {
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Lozinka", color = Color.Black, fontWeight =FontWeight.Bold) },
+                label = { Text("Lozinka", color = Color.Black, fontWeight = FontWeight.Bold) },
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = Color.Black) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
+                singleLine = true, // Onemogućuje povećavanje pri stiskanju enter
                 visualTransformation = PasswordVisualTransformation(),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.Black,
@@ -110,7 +112,11 @@ fun LoginScreen() {
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = { /* Login logika */ },
+                onClick = {
+                    val intent = Intent(context, MainActivity::class.java)
+                    context.startActivity(intent)
+                    (context as? ComponentActivity)?.finish() // Zatvori LoginActivity
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
