@@ -1,4 +1,4 @@
-package com.example.domi.ui.theme
+package com.example.domi
 
 import androidx.compose.ui.graphics.Color
 
