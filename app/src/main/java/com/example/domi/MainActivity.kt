@@ -5,18 +5,43 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -62,8 +87,8 @@ fun MainScreen(
         topBar = {
             if (currentRoute == "pets" || currentRoute == "settings") {
                 TopAppBar(
-                    title = { 
-                        Text(if (currentRoute == "pets") "Ljubimci" else "Postavke") 
+                    title = {
+                        Text(if (currentRoute == "pets") "Ljubimci" else "Postavke")
                     }
                 )
             }
@@ -120,7 +145,7 @@ fun BottomNavigationBar(navController: NavHostController) {
     }
 }
 
-sealed class NavigationItem(var route: String, var icon: androidx.compose.ui.graphics.vector.ImageVector, var title: String) {
+sealed class NavigationItem(val route: String, val icon: ImageVector, val title: String) {
     object Pets : NavigationItem("pets", Icons.AutoMirrored.Filled.List, "Ljubimci")
     object Settings : NavigationItem("settings", Icons.Default.Settings, "Postavke")
 }
@@ -133,9 +158,9 @@ fun NavigationGraph(
 ) {
     NavHost(navController, startDestination = "pets") {
         composable("pets") {
-            AnimalListScreen(onAnimalClick = { animal ->
+            AnimalListScreen { animal ->
                 navController.navigate("animal_detail/${animal.id}")
-            })
+            }
         }
         composable("settings") {
             SettingsScreen(
@@ -149,7 +174,7 @@ fun NavigationGraph(
         ) { backStackEntry ->
             val animalId = backStackEntry.arguments?.getInt("animalId")
             val animal = AnimalRepository.animals.find { it.id == animalId }
-            
+
             if (animal != null) {
                 AnimalDetailScreen(
                     animal = animal,
@@ -170,7 +195,7 @@ fun AnimalDetailScreen(animal: Animal, onBack: () -> Unit) {
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_arrow_back), 
+                            painter = painterResource(id = R.drawable.ic_arrow_back),
                             contentDescription = "Nazad",
                             modifier = Modifier.size(24.dp)
                         )
