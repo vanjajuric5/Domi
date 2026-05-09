@@ -11,21 +11,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = AutumnPrimaryDark,
+    secondary = AutumnSecondaryDark,
+    tertiary = AutumnTertiaryDark,
+    background = AutumnBackgroundDark,
+    surface = AutumnSurfaceDark,
+    surfaceVariant = AutumnSurfaceVariantDark,
+    secondaryContainer = AutumnCardGreenDark // Zelene kartice u tamnom načinu
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = AutumnPrimary,
+    secondary = AutumnSecondary,
+    tertiary = AutumnTertiary,
+    background = AutumnBackground,
+    surface = AutumnSurface,
+    surfaceVariant = AutumnSurfaceVariant,
+    secondaryContainer = AutumnCardGreen // Zelene kartice u svijetlom načinu
 )
 
 @Composable
 fun DomiTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

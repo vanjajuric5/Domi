@@ -28,23 +28,15 @@ fun SettingsScreen(
     var notificationsEnabled by remember { mutableStateOf(true) }
     val context = LocalContext.current
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Postavke") }
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Profile Section
-            ProfileSection()
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Profile Section
+        ProfileSection()
 
             Spacer(modifier = Modifier.height(24.dp))
             HorizontalDivider()
@@ -96,12 +88,11 @@ fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
             ) {
-                Text("Odjavi se")
+                Text("Odjavi se", color = androidx.compose.ui.graphics.Color.White)
             }
         }
-    }
 }
 
 @Composable

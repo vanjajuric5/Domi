@@ -26,6 +26,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,87 +44,133 @@ class LoginActivity : ComponentActivity() {
 fun LoginScreen() {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.paw_background),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
-            alpha = 0.4f // Smanjen opacity pozadine
-        )
+    // Testni podaci
+    val testEmail = "korisnik@email.com"
+    val testPassword = "lozinka123"
 
-        Column(
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ) { paddingValues ->
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(26.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(paddingValues)
         ) {
-            Text(
-                text = "Prijava",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
+            Image(
+                painter = painterResource(id = R.drawable.paw_background),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop,
+                alpha = 0.4f
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
-
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email", color = Color.Black, fontWeight = FontWeight.Bold) },
-                leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = Color.Black) },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                singleLine = true, // Onemogućuje povećavanje pri stiskanju enter
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    focusedBorderColor = Color.Black,
-                    unfocusedBorderColor = Color.Black.copy(alpha = 0.9f)
-                ),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Lozinka", color = Color.Black, fontWeight = FontWeight.Bold) },
-                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = Color.Black) },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                singleLine = true, // Onemogućuje povećavanje pri stiskanju enter
-                visualTransformation = PasswordVisualTransformation(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    focusedBorderColor = Color.Black,
-                    unfocusedBorderColor = Color.Black.copy(alpha = 0.9f)
-                ),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                onClick = {
-                    val intent = Intent(context, MainActivity::class.java)
-                    context.startActivity(intent)
-                    (context as? ComponentActivity)?.finish() // Zatvori LoginActivity
-                },
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                    .fillMaxSize()
+                    .padding(26.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Text("PRIJAVI SE", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    text = "Prijava",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { 
+                        email = it
+                        errorMessage = null 
+                    },
+                    label = { Text("Email", color = Color.Black, fontWeight = FontWeight.Bold) },
+                    leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = Color.Black) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    singleLine = true,
+                    isError = errorMessage != null,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
+                        focusedBorderColor = Color.Black,
+                        unfocusedBorderColor = Color.Black.copy(alpha = 0.9f)
+                    ),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { 
+                        password = it
+                        errorMessage = null
+                    },
+                    label = { Text("Lozinka", color = Color.Black, fontWeight = FontWeight.Bold) },
+                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = Color.Black) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    singleLine = true,
+                    visualTransformation = PasswordVisualTransformation(),
+                    isError = errorMessage != null,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
+                        focusedBorderColor = Color.Black,
+                        unfocusedBorderColor = Color.Black.copy(alpha = 0.9f)
+                    ),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                )
+
+                if (errorMessage != null) {
+                    Text(
+                        text = errorMessage!!,
+                        color = MaterialTheme.colorScheme.error,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Button(
+                    onClick = {
+                        if (email == testEmail && password == testPassword) {
+                            val intent = Intent(context, MainActivity::class.java)
+                            context.startActivity(intent)
+                            (context as? ComponentActivity)?.finish()
+                        } else {
+                            errorMessage = "Neispravan email ili lozinka"
+                            scope.launch {
+                                snackbarHostState.showSnackbar("Pokušajte ponovno")
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("PRIJAVI SE", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Text(
+                    text = "Testni podaci: korisnik@email.com / lozinka123",
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
             }
         }
     }
