@@ -86,11 +86,11 @@ fun LoginScreen() {
                 .padding(paddingValues),
         ) {
             Image(
-                painter = painterResource(id = R.drawable.paw_background),
+                painter = painterResource(id = R.drawable.paw_pattern),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
-                alpha = 0.4f,
+                alpha = 0.3f,
             )
 
             Column(
