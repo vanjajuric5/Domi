@@ -41,6 +41,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -76,19 +78,19 @@ fun LoginScreen() {
     val testPassword = "lozinka123"
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
         ) {
             Image(
                 painter = painterResource(id = R.drawable.paw_background),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
-                alpha = 0.4f
+                alpha = 0.4f,
             )
 
             Column(
@@ -96,13 +98,23 @@ fun LoginScreen() {
                     .fillMaxSize()
                     .padding(26.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
             ) {
                 Text(
                     text = "Prijava",
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Serif,
                     color = Color.Black
+                )
+
+                Text(
+                    text = "Udomi uz Domi!",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontStyle = FontStyle.Italic,
+                    fontFamily = FontFamily.Serif,
+                    color = MaterialTheme.colorScheme.primary
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -165,7 +177,7 @@ fun LoginScreen() {
 
                 Button(
                     onClick = {
-                        if (email == testEmail && password == testPassword) {
+                        if ((email == testEmail) && (password == testPassword)) {
                             val intent = Intent(context, MainActivity::class.java)
                             context.startActivity(intent)
                             (context as? ComponentActivity)?.finish()

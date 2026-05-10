@@ -41,9 +41,9 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun SettingsScreen(
     isNightMode: Boolean,
-    onNightModeChange: (Boolean) -> Unit
+    onNightModeChange: (Boolean) -> Unit,
 ) {
-    var notificationsEnabled by remember { mutableStateOf(true) }
+    var notificationsEnabled by remember { mutableStateOf(value = true) }
     val context = LocalContext.current
 
     Column(
@@ -72,27 +72,23 @@ fun SettingsScreen(
             title = "Obavijesti",
             iconResId = R.drawable.ic_notifications,
             checked = notificationsEnabled,
-            onCheckedChange = { notificationsEnabled = it }
-        )
+        ) { notificationsEnabled = it }
 
         SettingsClickableItem(
             title = "Jezik",
             subtitle = "Hrvatski",
             iconResId = R.drawable.ic_language,
-            onClick = { /* TODO: Change Language */ }
-        )
+        ) { /* TODO: Change Language */ }
 
         SettingsClickableItem(
             title = "Česta pitanja (FAQ)",
             iconResId = R.drawable.ic_qna,
-            onClick = { /* TODO: Navigate to FAQ */ }
-        )
+        ) { /* TODO: Navigate to FAQ */ }
 
         SettingsClickableItem(
             title = "O nama",
             iconResId = R.drawable.ic_info,
-            onClick = { /* TODO: Navigate to About Us */ }
-        )
+        ) { /* TODO: Navigate to About Us */ }
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -117,7 +113,7 @@ fun SettingsScreen(
 fun ProfileSection() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     ) {
         // Placeholder for profile picture
         Box(
@@ -167,7 +163,7 @@ fun SettingsToggleItem(
     title: String,
     iconResId: Int,
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
 ) {
     ListItem(
         headlineContent = { Text(title) },
@@ -198,6 +194,6 @@ fun SettingsClickableItem(
 @Composable
 fun SettingsScreenPreview() {
     DomiTheme {
-        SettingsScreen(isNightMode = false, onNightModeChange = {})
+        SettingsScreen(isNightMode = false) {}
     }
 }
