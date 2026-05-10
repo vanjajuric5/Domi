@@ -40,11 +40,11 @@ data class Animal(
 
 object AnimalRepository {
     val animals = listOf(
-        Animal(1, "Bobi", "Mješanac", "2 godine", "Bobi je veseo i zaigran pas koji traži novi dom. Voli duge šetnje i igru s lopticom. Dobro se slaže s drugim psima i djecom.", R.drawable.ic_profile),
-        Animal(2, "Luna", "Zlatni retriver", "1 godina", "Luna je mirna i privržena ženka. Obožava maženje i vrlo je poslušna. Idealna za obitelj sa stanom.", R.drawable.ic_profile),
-        Animal(3, "Maks", "Njemački ovčar", "4 godine", "Maks je odan čuvar i vrlo pametan pas. Potreban mu je aktivan vlasnik koji će s njim raditi i vježbati.", R.drawable.ic_profile),
-        Animal(4, "Bella", "Pudla", "3 godine", "Bella je prava mala dama. Ne linja se i vrlo je umiljata. Voli biti u centru pažnje i ići u šetnje gradom.", R.drawable.ic_profile),
-        Animal(5, "Rex", "Rotvajler", "5 godina", "Rex je snažan pas velikog srca. Iako izgleda opasno, on je prava maza prema ljudima koje poznaje.", R.drawable.ic_profile)
+        Animal(1, "Darcy", "Njemački prepeličar", "8 godina", "Darcy je veseo i zaigran pas koji traži novi dom. Voli duge šetnje i igru s lopticom. Dobro se slaže s drugim psima i djecom.", R.drawable.darcy),
+        Animal(2, "Luna", "Bosanski barak", "1 godina", "Luna je mirna i privržena ženka. Obožava maženje i vrlo je poslušna. Idealna za obitelj sa stanom.", R.drawable.bari),
+        Animal(3, "Maks", "Maine coon", "4 godine", "Maks je samostalan mačak koji dopušta da ga se mazi kada on to želi, ali uvijek će biti uz Vas i suptilno vam pokazivati koliko Vas voli.", R.drawable.img),
+        Animal(4, "Bella", "Beagle", "3 godine", "Bella je prava mala dama. Ne linja se i vrlo je umiljata. Voli biti u centru pažnje i ići u šetnje gradom.", R.drawable.bella),
+        Animal(5, "Rex", "Mješanac", "5 godina", "Rex je snažan pas velikog srca. Iako izgleda opasno, on je prava maza prema ljudima koje poznaje.", R.drawable.apas)
     )
 }
 
