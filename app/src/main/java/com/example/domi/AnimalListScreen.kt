@@ -46,6 +46,10 @@ object AnimalRepository {
         Animal(4, "Bella", "Beagle", "3 godine", "Bella je prava mala dama. Ne linja se i vrlo je umiljata. Voli biti u centru pažnje i ići u šetnje gradom.", R.drawable.bella),
         Animal(5, "Rex", "Mješanac", "5 godina", "Rex je snažan pas velikog srca. Iako izgleda opasno, on je prava maza prema ljudima koje poznaje.", R.drawable.apas),
     )
+
+    fun getAnimalById(id: Int): Animal? {
+        return animals.find { it.id == id }
+    }
 }
 
 @Composable
