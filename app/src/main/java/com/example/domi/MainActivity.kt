@@ -59,6 +59,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.compose.ui.platform.testTag
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -136,7 +137,8 @@ fun MainScreen(
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .testTag("glavni_ekran"),   //dodano
             color = MaterialTheme.colorScheme.background
         ) {
             NavigationGraph(navController, isNightMode, onNightModeChange)

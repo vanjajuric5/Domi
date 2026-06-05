@@ -49,6 +49,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.testTag
 import kotlinx.coroutines.launch
 
 class LoginActivity : ComponentActivity() {
@@ -68,23 +69,25 @@ fun LoginScreen() {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    
+
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Testni podaci
     val testEmail = "korisnik@email.com"
     val testPassword = "lozinka123"
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { paddingValues ->
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
+                .padding(paddingValues)
+                .testTag("login_screen")   //dodano
         ) {
+
             Image(
                 painter = painterResource(id = R.drawable.paw_pattern),
                 contentDescription = null,
@@ -100,6 +103,7 @@ fun LoginScreen() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
+
                 Text(
                     text = "Prijava",
                     fontSize = 32.sp,
@@ -119,48 +123,44 @@ fun LoginScreen() {
 
                 Spacer(modifier = Modifier.height(32.dp))
 
+
                 OutlinedTextField(
                     value = email,
-                    onValueChange = { 
+                    onValueChange = {
                         email = it
-                        errorMessage = null 
+                        errorMessage = null
                     },
-                    label = { Text("Email", color = Color.Black, fontWeight = FontWeight.Bold) },
-                    leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = Color.Black) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
+                    label = { Text("Email") },
+                    leadingIcon = {
+                        Icon(Icons.Default.Email, contentDescription = null)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("email_input"),   //dodano
                     singleLine = true,
                     isError = errorMessage != null,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
-                        focusedBorderColor = Color.Black,
-                        unfocusedBorderColor = Color.Black.copy(alpha = 0.9f)
-                    ),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+
                 OutlinedTextField(
                     value = password,
-                    onValueChange = { 
+                    onValueChange = {
                         password = it
                         errorMessage = null
                     },
-                    label = { Text("Lozinka", color = Color.Black, fontWeight = FontWeight.Bold) },
-                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = Color.Black) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
+                    label = { Text("Lozinka") },
+                    leadingIcon = {
+                        Icon(Icons.Default.Lock, contentDescription = null)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("password_input"),   //dodano
                     singleLine = true,
                     visualTransformation = PasswordVisualTransformation(),
                     isError = errorMessage != null,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
-                        focusedBorderColor = Color.Black,
-                        unfocusedBorderColor = Color.Black.copy(alpha = 0.9f)
-                    ),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
                 )
 
@@ -169,15 +169,18 @@ fun LoginScreen() {
                         text = errorMessage!!,
                         color = MaterialTheme.colorScheme.error,
                         fontSize = 12.sp,
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier
+                            .padding(top = 8.dp)
+                            .testTag("error_message")   //dodano
                     )
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+
                 Button(
                     onClick = {
-                        if ((email == testEmail) && (password == testPassword)) {
+                        if (email == testEmail && password == testPassword) {
                             val intent = Intent(context, MainActivity::class.java)
                             context.startActivity(intent)
                             (context as? ComponentActivity)?.finish()
@@ -190,15 +193,18 @@ fun LoginScreen() {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp),
+                        .height(56.dp)
+                        .testTag("login_button"),   // dodano
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
                 ) {
-                    Text("PRIJAVI SE", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text("PRIJAVI SE")
                 }
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 Text(
                     text = "Testni podaci: korisnik@email.com / lozinka123",
                     fontSize = 12.sp,
