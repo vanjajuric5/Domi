@@ -106,10 +106,13 @@ fun MainScreen(
                     },
                     navigationIcon = {
                         if (isDetail) {
-                            IconButton(onClick = { navController.popBackStack() }) {
+                            IconButton(
+                                onClick = { navController.popBackStack() },
+                                modifier = Modifier.testTag("back_button") // DODAJ OVO
+                            ) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_arrow_back),
-                                    contentDescription = "Nazad",
+                                    contentDescription = null, // null jer koristimo testTag
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -161,9 +164,15 @@ fun BottomNavigationBar(navController: NavHostController) {
 
         items.forEach { item ->
             NavigationBarItem(
-                icon = { Icon(item.icon, contentDescription = item.title) },
+                icon = { Icon(item.icon, contentDescription = null) },
                 label = { Text(text = item.title) },
                 selected = currentRoute == item.route,
+                modifier = Modifier.testTag(
+                    when (item.route) {
+                        "settings" -> "settings_button"
+                        else -> item.route
+                    }
+                ),
                 onClick = {
                     navController.navigate(item.route) {
                         navController.graph.startDestinationRoute?.let { route ->

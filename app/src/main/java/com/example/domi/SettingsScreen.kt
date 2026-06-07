@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -65,14 +66,17 @@ fun SettingsScreen(
             title = "Noćni način rada",
             iconResId = R.drawable.ic_nightlight,
             checked = isNightMode,
-            onCheckedChange = onNightModeChange
+            onCheckedChange = onNightModeChange,
+            modifier = Modifier.testTag("night_mode_toggle")
         )
 
         SettingsToggleItem(
             title = "Obavijesti",
             iconResId = R.drawable.ic_notifications,
             checked = notificationsEnabled,
-        ) { notificationsEnabled = it }
+            onCheckedChange = { notificationsEnabled = it },
+            modifier = Modifier.testTag("notifications_toggle")
+        )
 
         SettingsClickableItem(
             title = "Jezik",
@@ -164,8 +168,10 @@ fun SettingsToggleItem(
     iconResId: Int,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     ListItem(
+        modifier = modifier,
         headlineContent = { Text(title) },
         leadingContent = { Icon(painterResource(id = iconResId), contentDescription = null) },
         trailingContent = {
