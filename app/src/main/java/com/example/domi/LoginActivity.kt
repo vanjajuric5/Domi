@@ -29,6 +29,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -73,13 +74,12 @@ fun LoginScreen() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-
-    val testEmail = "korisnik@email.com"
-    val testPassword = "lozinka123"
+    val dbHelper = remember { DatabaseHelper(context) }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { paddingValues ->
+        // ... ostatak koda unutar Box-a ...
 
         Box(
             modifier = Modifier
@@ -180,14 +180,17 @@ fun LoginScreen() {
 
                 Button(
                     onClick = {
-                        if (email == testEmail && password == testPassword) {
-                            val intent = Intent(context, MainActivity::class.java)
+                        val role = dbHelper.getUserRole(email, password)
+                        if (role != -1) {
+                            val intent = Intent(context, MainActivity::class.java).apply {
+                                putExtra("IS_ADMIN", role == 1)
+                            }
                             context.startActivity(intent)
                             (context as? ComponentActivity)?.finish()
                         } else {
                             errorMessage = "Neispravan email ili lozinka"
                             scope.launch {
-                                snackbarHostState.showSnackbar("Pokušajte ponovno")
+                                snackbarHostState.showSnackbar("Korisnik ne postoji ili su podaci krivi")
                             }
                         }
                     },
@@ -205,8 +208,17 @@ fun LoginScreen() {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                TextButton(onClick = {
+                    val intent = Intent(context, RegisterActivity::class.java)
+                    context.startActivity(intent)
+                }) {
+                    Text("Nemaš račun? Registriraj se")
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+                
                 Text(
-                    text = "Testni podaci: korisnik@email.com / lozinka123",
+                    text = "Prvo se registrirajte za ulaz u aplikaciju",
                     fontSize = 12.sp,
                     color = Color.Gray
                 )
