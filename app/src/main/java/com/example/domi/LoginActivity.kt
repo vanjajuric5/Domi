@@ -24,7 +24,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -51,7 +50,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.testTag
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,27 +75,19 @@ fun LoginScreen() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    val dbHelper = remember { DatabaseHelper(context) }
+    val dbHelper = remember { DatabaseHelper(context.applicationContext) }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { paddingValues ->
-        // ... ostatak koda unutar Box-a ...
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .testTag("login_screen")   //dodano
+                .testTag("login_screen")
         ) {
-
-            Image(
-                painter = painterResource(id = R.drawable.paw_pattern),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop,
-                alpha = 0.3f,
-            )
+            // Background Image - static
+            LoginBackground()
 
             Column(
                 modifier = Modifier
@@ -103,7 +96,6 @@ fun LoginScreen() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-
                 Text(
                     text = "Prijava",
                     fontSize = 32.sp,
@@ -123,20 +115,15 @@ fun LoginScreen() {
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-
                 OutlinedTextField(
                     value = email,
                     onValueChange = {
                         email = it
-                        errorMessage = null
+                        if (errorMessage != null) errorMessage = null
                     },
                     label = { Text("Email") },
-                    leadingIcon = {
-                        Icon(Icons.Default.Email, contentDescription = null)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("email_input"),   //dodano
+                    leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+                    modifier = Modifier.fillMaxWidth().testTag("email_input"),
                     singleLine = true,
                     isError = errorMessage != null,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
@@ -144,20 +131,15 @@ fun LoginScreen() {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-
                 OutlinedTextField(
                     value = password,
                     onValueChange = {
                         password = it
-                        errorMessage = null
+                        if (errorMessage != null) errorMessage = null
                     },
                     label = { Text("Lozinka") },
-                    leadingIcon = {
-                        Icon(Icons.Default.Lock, contentDescription = null)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("password_input"),   //dodano
+                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                    modifier = Modifier.fillMaxWidth().testTag("password_input"),
                     singleLine = true,
                     visualTransformation = PasswordVisualTransformation(),
                     isError = errorMessage != null,
@@ -169,35 +151,39 @@ fun LoginScreen() {
                         text = errorMessage!!,
                         color = MaterialTheme.colorScheme.error,
                         fontSize = 12.sp,
-                        modifier = Modifier
-                            .padding(top = 8.dp)
-                            .testTag("error_message")   //dodano
+                        modifier = Modifier.padding(top = 8.dp).testTag("error_message")
                     )
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-
                 Button(
                     onClick = {
-                        val role = dbHelper.getUserRole(email, password)
-                        if (role != -1) {
-                            val intent = Intent(context, MainActivity::class.java).apply {
-                                putExtra("IS_ADMIN", role == 1)
-                            }
-                            context.startActivity(intent)
-                            (context as? ComponentActivity)?.finish()
-                        } else {
-                            errorMessage = "Neispravan email ili lozinka"
-                            scope.launch {
-                                snackbarHostState.showSnackbar("Korisnik ne postoji ili su podaci krivi")
+                        scope.launch {
+                            try {
+                                val user = withContext(Dispatchers.IO) {
+                                    dbHelper.getLoggedInUser(email, password)
+                                }
+                                if (user != null) {
+                                    val intent = Intent(context, MainActivity::class.java).apply {
+                                        putExtra("USER_NAME", user.name)
+                                        putExtra("USER_EMAIL", user.email)
+                                        putExtra("IS_ADMIN", user.isAdmin)
+                                    }
+                                    context.startActivity(intent)
+                                    (context as? ComponentActivity)?.finish()
+                                } else {
+                                    errorMessage = "Neispravan email ili lozinka"
+                                }
+                            } catch (e: Exception) {
+                                errorMessage = "Greška u bazi podataka"
                             }
                         }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp)
-                        .testTag("login_button"),   // dodano
+                        .testTag("login_button"),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary
@@ -225,6 +211,17 @@ fun LoginScreen() {
             }
         }
     }
+}
+
+@Composable
+fun LoginBackground() {
+    Image(
+        painter = painterResource(id = R.drawable.paw_pattern),
+        contentDescription = null,
+        modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop,
+        alpha = 0.3f,
+    )
 }
 
 @Preview(showBackground = true)

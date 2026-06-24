@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,6 +19,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RegisterActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +47,8 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit) {
     var experience by remember { mutableStateOf("") }
 
     val context = LocalContext.current
-    val dbHelper = remember { DatabaseHelper(context) }
+    val scope = rememberCoroutineScope()
+    val dbHelper = remember { DatabaseHelper(context.applicationContext) }
 
     Scaffold { padding ->
         Column(
@@ -62,7 +67,8 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit) {
                 value = name,
                 onValueChange = { name = it },
                 label = { Text("Ime i prezime") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -70,7 +76,8 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit) {
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -79,7 +86,8 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit) {
                 onValueChange = { password = it },
                 label = { Text("Lozinka") },
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -87,7 +95,8 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit) {
                 value = phone,
                 onValueChange = { phone = it },
                 label = { Text("Broj mobitela") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -95,7 +104,8 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit) {
                 value = city,
                 onValueChange = { city = it },
                 label = { Text("Grad (Prebivalište)") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -111,18 +121,23 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit) {
             Button(
                 onClick = {
                     if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
-                        val result = dbHelper.registerUser(name, email, password, phone, city, experience)
-                        if (result != -1L) {
-                            Toast.makeText(context, "Registracija uspješna!", Toast.LENGTH_SHORT).show()
-                            onRegistrationSuccess()
-                        } else {
-                            Toast.makeText(context, "Greška: Email je možda već zauzet.", Toast.LENGTH_SHORT).show()
+                        scope.launch {
+                            val result = withContext(Dispatchers.IO) {
+                                dbHelper.registerUser(name, email, password, phone, city, experience)
+                            }
+                            if (result != -1L) {
+                                Toast.makeText(context, "Registracija uspješna!", Toast.LENGTH_SHORT).show()
+                                onRegistrationSuccess()
+                            } else {
+                                Toast.makeText(context, "Greška: Email je možda već zauzet.", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     } else {
                         Toast.makeText(context, "Popunite obavezna polja (Ime, Email, Lozinka).", Toast.LENGTH_SHORT).show()
                     }
                 },
-                modifier = Modifier.fillMaxWidth().height(56.dp)
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = RoundedCornerShape(12.dp)
             ) {
                 Text("REGISTRIRAJ SE")
             }

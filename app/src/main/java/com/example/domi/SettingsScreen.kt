@@ -41,8 +41,13 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun SettingsScreen(
+    userName: String,
+    userEmail: String,
     isNightMode: Boolean,
     onNightModeChange: (Boolean) -> Unit,
+    onEditProfileClick: () -> Unit,
+    onFAQClick: () -> Unit,
+    onAboutUsClick: () -> Unit
 ) {
     var notificationsEnabled by remember { mutableStateOf(value = true) }
     val context = LocalContext.current
@@ -55,7 +60,7 @@ fun SettingsScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Profile Section
-        ProfileSection()
+        ProfileSection(userName, userEmail, onEditProfileClick)
 
         Spacer(modifier = Modifier.height(24.dp))
         HorizontalDivider()
@@ -87,12 +92,14 @@ fun SettingsScreen(
         SettingsClickableItem(
             title = "Česta pitanja (FAQ)",
             iconResId = R.drawable.ic_qna,
-        ) { /* TODO: Navigate to FAQ */ }
+            onClick = onFAQClick
+        )
 
         SettingsClickableItem(
             title = "O nama",
             iconResId = R.drawable.ic_info,
-        ) { /* TODO: Navigate to About Us */ }
+            onClick = onAboutUsClick
+        )
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -114,12 +121,12 @@ fun SettingsScreen(
 }
 
 @Composable
-fun ProfileSection() {
+fun ProfileSection(name: String, email: String, onEditClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        // Placeholder for profile picture
+        // ... (existing icon box code) ...
         Box(
             modifier = Modifier
                 .size(100.dp)
@@ -138,19 +145,19 @@ fun ProfileSection() {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Ime Prezime",
+            text = name,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
         Text(
-            text = "korisnik@email.com",
+            text = email,
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        Button(onClick = { /* TODO: Edit Profile */ }) {
+        Button(onClick = onEditClick) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_edit),
                 contentDescription = null,
@@ -200,6 +207,14 @@ fun SettingsClickableItem(
 @Composable
 fun SettingsScreenPreview() {
     DomiTheme {
-        SettingsScreen(isNightMode = false) {}
+        SettingsScreen(
+            userName = "Ime Prezime",
+            userEmail = "email@domi.com",
+            isNightMode = false,
+            onNightModeChange = {},
+            onEditProfileClick = {},
+            onFAQClick = {},
+            onAboutUsClick = {}
+        )
     }
 }
