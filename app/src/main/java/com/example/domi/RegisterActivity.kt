@@ -124,15 +124,6 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit, onBack: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = experience,
-                onValueChange = { experience = it },
-                label = { Text("Iskustvo s ljubimcima") },
-                modifier = Modifier.fillMaxWidth(),
-                minLines = 3
-            )
-            Spacer(modifier = Modifier.height(32.dp))
-
             Button(
                 onClick = {
                     if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {

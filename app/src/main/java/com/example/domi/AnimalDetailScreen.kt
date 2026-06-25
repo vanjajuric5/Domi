@@ -104,6 +104,7 @@ fun AnimalDetailScreen(animal: Animal, isAdmin: Boolean, userName: String, userE
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         StatusBadge(label = "Cijepljen", status = animal.isVaccinated)
                         StatusBadge(label = "Kastriran", status = animal.isNeutered)
+                        StatusBadge(label = "Čipiran", status = animal.isMicrochipped)
                     }
                     
                     Spacer(modifier = Modifier.height(8.dp))
