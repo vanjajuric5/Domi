@@ -18,7 +18,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -74,7 +73,7 @@ fun AddAnimalScreen(onBack: () -> Unit, onAnimalAdded: () -> Unit) {
         Spacer(modifier = Modifier.height(12.dp))
 
         ExposedDropdownMenuBox(expanded = typeExp, onExpandedChange = { typeExp = !typeExp }, modifier = Modifier.fillMaxWidth()) {
-            OutlinedTextField(value = selType, onValueChange = {}, readOnly = true, label = { Text("Vrsta") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = typeExp) }, modifier = Modifier.menuAnchor().fillMaxWidth())
+            OutlinedTextField(value = selType, onValueChange = {}, readOnly = true, label = { Text("Vrsta") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = typeExp) }, modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true).fillMaxWidth())
             ExposedDropdownMenu(expanded = typeExp, onDismissRequest = { typeExp = false }) {
                 types.forEach { t -> DropdownMenuItem(text = { Text(t) }, onClick = { selType = t; typeExp = false }) }
             }
@@ -88,7 +87,7 @@ fun AddAnimalScreen(onBack: () -> Unit, onAnimalAdded: () -> Unit) {
         Spacer(modifier = Modifier.height(12.dp))
 
         ExposedDropdownMenuBox(expanded = ageExp, onExpandedChange = { ageExp = !ageExp }, modifier = Modifier.fillMaxWidth()) {
-            OutlinedTextField(value = selAgeCat, onValueChange = {}, readOnly = true, label = { Text("Kategorija za filter") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = ageExp) }, modifier = Modifier.menuAnchor().fillMaxWidth())
+            OutlinedTextField(value = selAgeCat, onValueChange = {}, readOnly = true, label = { Text("Kategorija za filter") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = ageExp) }, modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true).fillMaxWidth())
             ExposedDropdownMenu(expanded = ageExp, onDismissRequest = { ageExp = false }) {
                 ageCats.forEach { a -> DropdownMenuItem(text = { Text(a) }, onClick = { selAgeCat = a; ageExp = false }) }
             }
@@ -96,7 +95,7 @@ fun AddAnimalScreen(onBack: () -> Unit, onAnimalAdded: () -> Unit) {
         Spacer(modifier = Modifier.height(12.dp))
 
         ExposedDropdownMenuBox(expanded = genExp, onExpandedChange = { genExp = !genExp }, modifier = Modifier.fillMaxWidth()) {
-            OutlinedTextField(value = selGender, onValueChange = {}, readOnly = true, label = { Text("Spol") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = genExp) }, modifier = Modifier.menuAnchor().fillMaxWidth())
+            OutlinedTextField(value = selGender, onValueChange = {}, readOnly = true, label = { Text("Spol") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = genExp) }, modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true).fillMaxWidth())
             ExposedDropdownMenu(expanded = genExp, onDismissRequest = { genExp = false }) {
                 genders.forEach { g -> DropdownMenuItem(text = { Text(g) }, onClick = { selGender = g; genExp = false }) }
             }
@@ -104,7 +103,7 @@ fun AddAnimalScreen(onBack: () -> Unit, onAnimalAdded: () -> Unit) {
         Spacer(modifier = Modifier.height(12.dp))
 
         ExposedDropdownMenuBox(expanded = shelterExp, onExpandedChange = { shelterExp = !shelterExp }, modifier = Modifier.fillMaxWidth()) {
-            OutlinedTextField(value = selShelter, onValueChange = {}, readOnly = true, label = { Text("Sklonište") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = shelterExp) }, modifier = Modifier.menuAnchor().fillMaxWidth())
+            OutlinedTextField(value = selShelter, onValueChange = {}, readOnly = true, label = { Text("Sklonište") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = shelterExp) }, modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true).fillMaxWidth())
             ExposedDropdownMenu(expanded = shelterExp, onDismissRequest = { shelterExp = false }) {
                 shelters.forEach { s -> DropdownMenuItem(text = { Text(s) }, onClick = { selShelter = s; shelterExp = false }) }
             }
@@ -158,7 +157,6 @@ fun AddAnimalScreen(onBack: () -> Unit, onAnimalAdded: () -> Unit) {
             modifier = Modifier.fillMaxWidth().height(56.dp),
             shape = RoundedCornerShape(12.dp)
         ) { Text("DODAJ LJUBIMCA") }
-
         TextButton(onClick = onBack) { Text("Odustani") }
     }
 }

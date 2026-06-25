@@ -33,16 +33,18 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun AnimalDetailScreen(animal: Animal, isAdmin: Boolean, userName: String, userEmail: String) {
-    var showForm by remember { mutableStateOf(false) }
+    var showForm by remember { mutableStateOf(value = false) }
     
     if (showForm) {
-        AdoptionFormScreen(animalName = animal.name, userName = userName, userEmail = userEmail) { showForm = false }
+        AdoptionFormScreen(animalName = animal.name, userName = userName, userEmail = userEmail) { 
+            showForm = false 
+        }
     } else {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
         ) {
             Box(
                 modifier = Modifier
@@ -146,7 +148,7 @@ fun StatusBadge(label: String, status: Boolean) {
 
 @Composable
 fun AdoptionFormScreen(animalName: String, userName: String, userEmail: String, onBack: () -> Unit) {
-    var message by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf(value = "") }
     val context = LocalContext.current
     val dbHelper = remember { DatabaseHelper(context.applicationContext) }
     val scope = rememberCoroutineScope()

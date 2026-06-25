@@ -69,7 +69,7 @@ class MainActivity : ComponentActivity() {
                     isAdmin = isAdmin,
                     isNightMode = isNightMode,
                     onNightModeChange = { isNightMode = it },
-                    onUserNameChange = { userName = it }
+                    onUserNameChange = { userName = it },
                 )
             }
         }

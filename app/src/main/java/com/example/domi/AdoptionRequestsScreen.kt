@@ -25,6 +25,7 @@ fun AdoptionRequestsScreen() {
     val dbHelper = remember { DatabaseHelper(context) }
     var requests by remember { mutableStateOf(listOf<DatabaseHelper.AdoptionRequest>()) }
     val scope = rememberCoroutineScope()
+    var requestToDelete by remember { mutableStateOf<DatabaseHelper.AdoptionRequest?>(null) }
 
     fun refreshRequests() {
         scope.launch {
@@ -36,6 +37,37 @@ fun AdoptionRequestsScreen() {
 
     LaunchedEffect(Unit) {
         refreshRequests()
+    }
+
+    if (requestToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { requestToDelete = null },
+            title = { Text("Potvrda brisanja", fontWeight = FontWeight.Bold) },
+            text = { Text("Jeste li sigurni da želite obrisati ovaj zahtjev?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        requestToDelete?.let { request ->
+                            scope.launch {
+                                withContext(Dispatchers.IO) {
+                                    dbHelper.deleteRequest(request.id)
+                                }
+                                refreshRequests()
+                                requestToDelete = null
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Obriši")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { requestToDelete = null }) {
+                    Text("Odustani")
+                }
+            }
+        )
     }
 
     if (requests.isEmpty()) {
@@ -51,14 +83,7 @@ fun AdoptionRequestsScreen() {
             items(requests, key = { it.id }) { request ->
                 RequestCard(
                     request = request,
-                    onDelete = {
-                        scope.launch {
-                            withContext(Dispatchers.IO) {
-                                dbHelper.deleteRequest(request.id)
-                            }
-                            refreshRequests()
-                        }
-                    }
+                    onDelete = { requestToDelete = request }
                 )
             }
         }
