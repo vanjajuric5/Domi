@@ -1,19 +1,34 @@
 package com.example.domi
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -25,7 +40,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
-import androidx.navigation.compose.*
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,8 +59,8 @@ class MainActivity : ComponentActivity() {
         
         enableEdgeToEdge()
         setContent {
-            var isNightMode by remember { mutableStateOf(false) }
-            var userName by remember { mutableStateOf(initialName) }
+            var isNightMode by remember { mutableStateOf(value = false) }
+            var userName by remember { mutableStateOf(value = initialName) }
 
             DomiTheme(darkTheme = isNightMode) {
                 MainScreen(
@@ -66,7 +84,7 @@ fun MainScreen(
     isAdmin: Boolean,
     isNightMode: Boolean,
     onNightModeChange: (Boolean) -> Unit,
-    onUserNameChange: (String) -> Unit
+    onUserNameChange: (String) -> Unit,
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -83,12 +101,11 @@ fun MainScreen(
 
     Scaffold(
         topBar = {
-            if (currentRoute == "pets" || currentRoute == "settings" || isSpecial || currentRoute == "map" || currentRoute == "requests") {
+            if ((currentRoute == "pets") || (currentRoute == "settings") || isSpecial || (currentRoute == "requests")) {
                 TopAppBar(
                     title = {
                         val titleText = when (currentRoute) {
                             "pets" -> "Ljubimci"
-                            "map" -> "Skloništa"
                             "requests" -> "Zahtjevi"
                             "settings" -> "Postavke"
                             "edit_profile" -> "Uredi profil"
@@ -105,16 +122,18 @@ fun MainScreen(
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_arrow_back),
                                     contentDescription = "Nazad",
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(24.dp),
                                 )
                             }
                         }
                     },
                     actions = {
-                        if (isAdmin && currentRoute == "pets") {
-                            IconButton(onClick = { 
-                                navController.navigate("add_animal")
-                            }) {
+                        if (isAdmin && (currentRoute == "pets")) {
+                            IconButton(
+                                onClick = { 
+                                    navController.navigate("add_animal")
+                                },
+                            ) {
                                 Icon(Icons.Default.Add, contentDescription = "Dodaj životinu")
                             }
                         }
@@ -123,24 +142,24 @@ fun MainScreen(
                             modifier = Modifier.padding(end = 16.dp),
                             fontWeight = FontWeight.ExtraBold,
                             color = MaterialTheme.colorScheme.primary,
-                            fontSize = 18.sp
+                            fontSize = 18.sp,
                         )
-                    }
+                    },
                 )
             }
         },
         bottomBar = {
-            if (!isSpecial && (currentRoute == "pets" || currentRoute == "map" || currentRoute == "settings" || currentRoute == "requests")) {
+            if (!isSpecial && ((currentRoute == "pets") || (currentRoute == "settings") || (currentRoute == "requests"))) {
                 BottomNavigationBar(navController, isAdmin)
             }
-        }
+        },
     ) { innerPadding ->
         Surface(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .testTag("glavni_ekran"),
-            color = MaterialTheme.colorScheme.background
+            color = MaterialTheme.colorScheme.background,
         ) {
             NavigationGraph(
                 navController, 
@@ -150,7 +169,7 @@ fun MainScreen(
                 isNightMode, 
                 onNightModeChange, 
                 onUserNameChange,
-                dbHelper
+                dbHelper,
             )
         }
     }
@@ -161,8 +180,6 @@ fun BottomNavigationBar(navController: NavHostController, isAdmin: Boolean) {
     val items = mutableListOf<NavigationItem>(NavigationItem.Pets)
     if (isAdmin) {
         items.add(NavigationItem.Requests)
-    } else {
-        items.add(NavigationItem.Map)
     }
     items.add(NavigationItem.Settings)
 
@@ -180,7 +197,7 @@ fun BottomNavigationBar(navController: NavHostController, isAdmin: Boolean) {
                         launchSingleTop = true
                         restoreState = true
                     }
-                }
+                },
             )
         }
     }
@@ -188,7 +205,6 @@ fun BottomNavigationBar(navController: NavHostController, isAdmin: Boolean) {
 
 sealed class NavigationItem(val route: String, val icon: ImageVector, val title: String) {
     object Pets : NavigationItem("pets", Icons.AutoMirrored.Filled.List, "Ljubimci")
-    object Map : NavigationItem("map", Icons.Default.Map, "Karta")
     object Requests : NavigationItem("requests", Icons.Default.Email, "Zahtjevi")
     object Settings : NavigationItem("settings", Icons.Default.Settings, "Postavke")
 }
@@ -202,9 +218,9 @@ fun NavigationGraph(
     isNightMode: Boolean,
     onNightModeChange: (Boolean) -> Unit,
     onUserNameChange: (String) -> Unit,
-    dbHelper: DatabaseHelper
+    dbHelper: DatabaseHelper,
 ) {
-    var animals by remember { mutableStateOf(listOf<Animal>()) }
+    var animals by remember { mutableStateOf(value = listOf<Animal>()) }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
@@ -231,18 +247,19 @@ fun NavigationGraph(
                 },
                 onAnimalClick = { animal ->
                     navController.navigate("animal_detail/${animal.id}")
-                }
+                },
             )
         }
         composable("settings") {
             SettingsScreen(
                 userName = userName,
                 userEmail = userEmail,
+                isAdmin = isAdmin,
                 isNightMode = isNightMode,
                 onNightModeChange = onNightModeChange,
                 onEditProfileClick = { navController.navigate("edit_profile") },
                 onFAQClick = { navController.navigate("faq") },
-                onAboutUsClick = { navController.navigate("about_us") }
+                onAboutUsClick = { navController.navigate("about_us") },
             )
         }
         composable("edit_profile") {
@@ -252,7 +269,7 @@ fun NavigationGraph(
                 onUpdateSuccess = { newName ->
                     onUserNameChange(newName)
                     navController.popBackStack()
-                }
+                },
             )
         }
         composable("faq") {
@@ -260,9 +277,6 @@ fun NavigationGraph(
         }
         composable("about_us") {
             AboutUsScreen()
-        }
-        composable("map") {
-            MapScreen()
         }
         composable("requests") {
             AdoptionRequestsScreen()
@@ -278,15 +292,15 @@ fun NavigationGraph(
                         animals = updated
                     }
                     navController.popBackStack()
-                }
+                },
             )
         }
         composable(
             route = "animal_detail/{animalId}",
-            arguments = listOf(navArgument("animalId") { type = NavType.IntType })
+            arguments = listOf(navArgument("animalId") { type = NavType.IntType }),
         ) { backStackEntry ->
             val animalId = backStackEntry.arguments?.getInt("animalId") ?: 0
-            var animal by remember { mutableStateOf<Animal?>(null) }
+            var animal by remember { mutableStateOf<Animal?>(value = null) }
             LaunchedEffect(animalId) {
                 animal = withContext(Dispatchers.IO) {
                     dbHelper.getAnimalById(animalId)
@@ -298,7 +312,7 @@ fun NavigationGraph(
                     animal = animal!!, 
                     isAdmin = isAdmin, 
                     userName = userName, 
-                    userEmail = userEmail
+                    userEmail = userEmail,
                 )
             }
         }
@@ -315,7 +329,7 @@ fun MainPreview() {
             isAdmin = false,
             isNightMode = false,
             onNightModeChange = {},
-            onUserNameChange = {}
+            onUserNameChange = {},
         )
     }
 }

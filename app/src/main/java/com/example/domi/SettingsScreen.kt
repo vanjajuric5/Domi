@@ -43,11 +43,12 @@ import androidx.compose.ui.unit.sp
 fun SettingsScreen(
     userName: String,
     userEmail: String,
+    isAdmin: Boolean,
     isNightMode: Boolean,
     onNightModeChange: (Boolean) -> Unit,
     onEditProfileClick: () -> Unit,
     onFAQClick: () -> Unit,
-    onAboutUsClick: () -> Unit
+    onAboutUsClick: () -> Unit,
 ) {
     var notificationsEnabled by remember { mutableStateOf(value = true) }
     val context = LocalContext.current
@@ -57,53 +58,53 @@ fun SettingsScreen(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // Profile Section
-        ProfileSection(userName, userEmail, onEditProfileClick)
+
+        ProfileSection(userName, userEmail, showEditButton = !isAdmin, onEditClick = onEditProfileClick)
 
         Spacer(modifier = Modifier.height(24.dp))
         HorizontalDivider()
         Spacer(modifier = Modifier.height(16.dp))
-
-        // Settings Options
+        
         SettingsToggleItem(
             title = "Noćni način rada",
             iconResId = R.drawable.ic_nightlight,
             checked = isNightMode,
             onCheckedChange = onNightModeChange,
-            modifier = Modifier.testTag("night_mode_toggle")
+            modifier = Modifier.testTag("night_mode_toggle"),
         )
 
-        SettingsToggleItem(
-            title = "Obavijesti",
-            iconResId = R.drawable.ic_notifications,
-            checked = notificationsEnabled,
-            onCheckedChange = { notificationsEnabled = it },
-            modifier = Modifier.testTag("notifications_toggle")
-        )
+        if (!isAdmin) {
+            SettingsToggleItem(
+                title = "Obavijesti",
+                iconResId = R.drawable.ic_notifications,
+                checked = notificationsEnabled,
+                onCheckedChange = { notificationsEnabled = it },
+                modifier = Modifier.testTag("notifications_toggle"),
+            )
 
-        SettingsClickableItem(
-            title = "Jezik",
-            subtitle = "Hrvatski",
-            iconResId = R.drawable.ic_language,
-        ) { /* TODO: Change Language */ }
+            SettingsClickableItem(
+                title = "Jezik",
+                subtitle = "Hrvatski",
+                iconResId = R.drawable.ic_language,
+            ) { /* TODO: Change Language */ }
 
-        SettingsClickableItem(
-            title = "Česta pitanja (FAQ)",
-            iconResId = R.drawable.ic_qna,
-            onClick = onFAQClick
-        )
+            SettingsClickableItem(
+                title = "Česta pitanja (FAQ)",
+                iconResId = R.drawable.ic_qna,
+                onClick = onFAQClick,
+            )
 
-        SettingsClickableItem(
-            title = "O nama",
-            iconResId = R.drawable.ic_info,
-            onClick = onAboutUsClick
-        )
+            SettingsClickableItem(
+                title = "O nama",
+                iconResId = R.drawable.ic_info,
+                onClick = onAboutUsClick,
+            )
+        }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Logout Button
         Button(
             onClick = {
                 val intent = Intent(context, LoginActivity::class.java)
@@ -113,7 +114,7 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
         ) {
             Text("Odjavi se", color = androidx.compose.ui.graphics.Color.White)
         }
@@ -121,24 +122,23 @@ fun SettingsScreen(
 }
 
 @Composable
-fun ProfileSection(name: String, email: String, onEditClick: () -> Unit) {
+fun ProfileSection(name: String, email: String, showEditButton: Boolean, onEditClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        // ... (existing icon box code) ...
         Box(
             modifier = Modifier
                 .size(100.dp)
                 .clip(CircleShape)
                 .padding(4.dp),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_profile),
                 contentDescription = "Profilna slika",
                 modifier = Modifier.fillMaxSize(),
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.primary,
             )
         }
 
@@ -147,24 +147,25 @@ fun ProfileSection(name: String, email: String, onEditClick: () -> Unit) {
         Text(
             text = name,
             fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
         Text(
             text = email,
             fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Button(onClick = onEditClick) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_edit),
-                contentDescription = null,
-                modifier = Modifier.size(18.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Uredi profil")
+        if (showEditButton) {
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(onClick = onEditClick) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_edit),
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Uredi profil")
+            }
         }
     }
 }
@@ -175,7 +176,7 @@ fun SettingsToggleItem(
     iconResId: Int,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     ListItem(
         modifier = modifier,
@@ -183,7 +184,7 @@ fun SettingsToggleItem(
         leadingContent = { Icon(painterResource(id = iconResId), contentDescription = null) },
         trailingContent = {
             Switch(checked = checked, onCheckedChange = onCheckedChange)
-        }
+        },
     )
 }
 
@@ -192,14 +193,14 @@ fun SettingsClickableItem(
     title: String,
     subtitle: String? = null,
     iconResId: Int,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     ListItem(
         headlineContent = { Text(title) },
         supportingContent = subtitle?.let { { Text(it) } },
         leadingContent = { Icon(painterResource(id = iconResId), contentDescription = null) },
         trailingContent = { Icon(painterResource(id = R.drawable.ic_chevron_right), contentDescription = null) },
-        modifier = Modifier.clickable { onClick() }
+        modifier = Modifier.clickable { onClick() },
     )
 }
 
@@ -210,11 +211,12 @@ fun SettingsScreenPreview() {
         SettingsScreen(
             userName = "Ime Prezime",
             userEmail = "email@domi.com",
+            isAdmin = false,
             isNightMode = false,
             onNightModeChange = {},
             onEditProfileClick = {},
             onFAQClick = {},
-            onAboutUsClick = {}
+            onAboutUsClick = {},
         )
     }
 }

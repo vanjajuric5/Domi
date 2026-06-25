@@ -1,17 +1,31 @@
 package com.example.domi
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -29,16 +43,17 @@ class RegisterActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DomiTheme {
-                RegisterScreen {
-                    finish() // Vrati se na login nakon uspješne registracije
-                }
+                RegisterScreen(
+                    onRegistrationSuccess = { finish() },
+                    onBack = { finish() }
+                )
             }
         }
     }
 }
 
 @Composable
-fun RegisterScreen(onRegistrationSuccess: () -> Unit) {
+fun RegisterScreen(onRegistrationSuccess: () -> Unit, onBack: () -> Unit) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -140,6 +155,12 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit) {
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text("REGISTRIRAJ SE")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            TextButton(onClick = onBack) {
+                Text("Odustani")
             }
         }
     }
