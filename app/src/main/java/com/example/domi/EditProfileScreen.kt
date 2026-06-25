@@ -88,11 +88,13 @@ fun EditProfileScreen(userEmail: String, onBack: () -> Unit, onUpdateSuccess: (S
                         val result = withContext(Dispatchers.IO) {
                             dbHelper.updateUser(userEmail, name, phone, city)
                         }
-                        if (result > 0) {
-                            Toast.makeText(context, "Profil ažuriran!", Toast.LENGTH_SHORT).show()
-                            onUpdateSuccess(name)
-                        } else {
-                            Toast.makeText(context, "Greška pri ažuriranju.", Toast.LENGTH_SHORT).show()
+                        withContext(Dispatchers.Main) {
+                            if (result > 0) {
+                                Toast.makeText(context, "Profil ažuriran!", Toast.LENGTH_SHORT).show()
+                                onUpdateSuccess(name)
+                            } else {
+                                Toast.makeText(context, "Greška pri ažuriranju.", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                 } else {

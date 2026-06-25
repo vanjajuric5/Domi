@@ -55,8 +55,11 @@ fun AdoptionRequestsScreen() {
 
     fun refreshRequests() {
         scope.launch {
-            requests = withContext(Dispatchers.IO) {
+            val updatedRequests = withContext(Dispatchers.IO) {
                 dbHelper.getAllRequests()
+            }
+            withContext(Dispatchers.Main) {
+                requests = updatedRequests
             }
         }
     }
@@ -77,8 +80,10 @@ fun AdoptionRequestsScreen() {
                             withContext(Dispatchers.IO) {
                                 dbHelper.deleteRequest(request.id)
                             }
-                            refreshRequests()
-                            requestToDelete = null
+                            withContext(Dispatchers.Main) {
+                                refreshRequests()
+                                requestToDelete = null
+                            }
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)

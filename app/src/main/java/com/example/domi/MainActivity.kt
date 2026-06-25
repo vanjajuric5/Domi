@@ -118,11 +118,14 @@ fun MainScreen(
                     },
                     navigationIcon = {
                         if (isSpecial) {
-                            IconButton(onClick = { navController.popBackStack() }) {
+                            IconButton(
+                                onClick = { navController.popBackStack() },
+                                modifier = Modifier.testTag("back_button")
+                            ) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_arrow_back),
                                     contentDescription = "Nazad",
-                                    modifier = Modifier.size(24.dp).testTag("back_button"),
+                                    modifier = Modifier.size(24.dp),
                                 )
                             }
                         }
@@ -193,15 +196,6 @@ fun BottomNavigationBar(navController: NavHostController, isAdmin: Boolean) {
                 icon = { Icon(item.icon, contentDescription = item.title) },
                 label = { Text(text = item.title) },
                 selected = currentRoute == item.route,
-                modifier = Modifier
-                    .testTag(
-                        when (item.route) {
-                            "settings" -> "settings_tab"
-                            "requests" -> "requests_tab"
-                            "pets" -> "pets_tab"
-                            else -> item.route
-                        }
-                    ),
                 onClick = {
                     navController.navigate(item.route) {
                         navController.graph.startDestinationRoute?.let { popUpTo(it) { saveState = true } }
@@ -234,10 +228,11 @@ fun NavigationGraph(
     var animals by remember { mutableStateOf(value = listOf<Animal>()) }
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) {
-        animals = withContext(Dispatchers.IO) {
+    LaunchedEffect(key1 = dbHelper) {
+        val list = withContext(Dispatchers.IO) {
             dbHelper.getAllAnimals()
         }
+        animals = list
     }
 
     NavHost(navController, startDestination = "pets") {

@@ -200,7 +200,7 @@ fun LoginScreen() {
                         val intent = Intent(context, RegisterActivity::class.java)
                         context.startActivity(intent)
                     },
-                    modifier = Modifier.testTag("goto_register_button")
+                    modifier = Modifier.testTag("register_link")
                 ) {
                     Text("Nemaš račun? Registriraj se")
                 }

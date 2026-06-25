@@ -164,7 +164,7 @@ fun AdoptionFormScreen(animalName: String, userName: String, userEmail: String, 
             value = message,
             onValueChange = { message = it },
             label = { Text("Zašto želite udomiti ovog ljubimca?") },
-            modifier = Modifier.fillMaxWidth().testTag("adopt_form_message"),
+            modifier = Modifier.fillMaxWidth().testTag("adoption_message_input"),
             minLines = 5
         )
         Spacer(modifier = Modifier.height(32.dp))
@@ -173,14 +173,18 @@ fun AdoptionFormScreen(animalName: String, userName: String, userEmail: String, 
                 if (message.isNotEmpty()) {
                     scope.launch {
                         val result = withContext(Dispatchers.IO) { dbHelper.addRequest(animalName, userName, userEmail, message) }
-                        if (result != -1L) {
-                            Toast.makeText(context, "Zahtjev poslan!", Toast.LENGTH_LONG).show()
-                            onBack()
+                        withContext(Dispatchers.Main) {
+                            if (result != -1L) {
+                                Toast.makeText(context, "Zahtjev poslan!", Toast.LENGTH_LONG).show()
+                                onBack()
+                            } else {
+                                Toast.makeText(context, "Greška pri slanju zahtjeva.", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                 }
             },
-            modifier = Modifier.fillMaxWidth().height(56.dp).testTag("send_request_button")
+            modifier = Modifier.fillMaxWidth().height(56.dp).testTag("send_adoption_request_button")
         ) { Text("POŠALJI ZAHTJEV") }
         TextButton(onClick = onBack) { Text("Odustani") }
     }

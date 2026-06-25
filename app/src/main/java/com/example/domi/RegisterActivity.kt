@@ -81,8 +81,8 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit, onBack: () -> Unit) {
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Ime i prezime") },
-                modifier = Modifier.fillMaxWidth().testTag("reg_name_input"),
+                label = { Text(text = "Ime i prezime") },
+                modifier = Modifier.fillMaxWidth().testTag("name_input"),
                 singleLine = true,
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -90,8 +90,8 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit, onBack: () -> Unit) {
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth().testTag("reg_email_input"),
+                label = { Text(text = "Email") },
+                modifier = Modifier.fillMaxWidth().testTag("email_input"),
                 singleLine = true,
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -99,9 +99,9 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit, onBack: () -> Unit) {
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Lozinka") },
+                label = { Text(text = "Lozinka") },
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth().testTag("reg_password_input"),
+                modifier = Modifier.fillMaxWidth().testTag("password_input"),
                 singleLine = true,
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -109,8 +109,8 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit, onBack: () -> Unit) {
             OutlinedTextField(
                 value = phone,
                 onValueChange = { phone = it },
-                label = { Text("Broj mobitela") },
-                modifier = Modifier.fillMaxWidth().testTag("reg_phone_input"),
+                label = { Text(text = "Broj mobitela") },
+                modifier = Modifier.fillMaxWidth().testTag("phone_input"),
                 singleLine = true,
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -118,8 +118,8 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit, onBack: () -> Unit) {
             OutlinedTextField(
                 value = city,
                 onValueChange = { city = it },
-                label = { Text("Grad (Prebivalište)") },
-                modifier = Modifier.fillMaxWidth().testTag("reg_city_input"),
+                label = { Text(text = "Grad (Prebivalište)") },
+                modifier = Modifier.fillMaxWidth().testTag("city_input"),
                 singleLine = true,
             )
             Spacer(modifier = Modifier.height(32.dp))
@@ -131,21 +131,23 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit, onBack: () -> Unit) {
                             val result = withContext(Dispatchers.IO) {
                                 dbHelper.registerUser(name, email, password, phone, city)
                             }
-                            if (result != -1L) {
-                                Toast.makeText(context, "Registracija uspješna!", Toast.LENGTH_SHORT).show()
-                                onRegistrationSuccess()
-                            } else {
-                                Toast.makeText(context, "Greška: Email je možda već zauzet.", Toast.LENGTH_SHORT).show()
+                            withContext(Dispatchers.Main) {
+                                if (result != -1L) {
+                                    Toast.makeText(context, "Registracija uspješna!", Toast.LENGTH_SHORT).show()
+                                    onRegistrationSuccess()
+                                } else {
+                                    Toast.makeText(context, "Greška: Email je možda već zauzet.", Toast.LENGTH_SHORT).show()
+                                }
                             }
                         }
                     } else {
                         Toast.makeText(context, "Popunite obavezna polja (Ime, Email, Lozinka).", Toast.LENGTH_SHORT).show()
                     }
                 },
-                modifier = Modifier.fillMaxWidth().height(56.dp).testTag("reg_button"),
+                modifier = Modifier.fillMaxWidth().height(56.dp).testTag("register_button"),
                 shape = RoundedCornerShape(12.dp),
             ) {
-                Text("REGISTRIRAJ SE")
+                Text(text = "REGISTRIRAJ SE")
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -154,7 +156,7 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit, onBack: () -> Unit) {
                 onClick = onBack,
                 modifier = Modifier.testTag("reg_back_button"),
             ) {
-                Text("Odustani")
+                Text(text = "Odustani")
             }
         }
     }

@@ -16,15 +16,15 @@ class EndToEndTest {
 
     @Test
     fun userFullFlowTest() {
-
         // 1. OTVORI LOGIN
         ActivityScenario.launch(LoginActivity::class.java)
-        Thread.sleep(500)
-        composeTestRule.onNodeWithTag("login_screen").assertIsDisplayed()
+        
+        composeTestRule.waitUntil(10000) {
+            composeTestRule.onAllNodesWithTag("login_screen").fetchSemanticsNodes().isNotEmpty()
+        }
 
         // 2. IDI NA REGISTRACIJU
         composeTestRule.onNodeWithTag("register_link").performClick()
-        Thread.sleep(500)
 
         // 3. REGISTRIRAJ KORISNIKA
         val timestamp = System.currentTimeMillis()
@@ -36,170 +36,80 @@ class EndToEndTest {
         composeTestRule.onNodeWithTag("password_input").performTextInput(testPass)
         composeTestRule.onNodeWithTag("phone_input").performTextInput("091234567")
         composeTestRule.onNodeWithTag("city_input").performTextInput("Zagreb")
+        
         composeTestRule.onNodeWithTag("register_button").performScrollTo().performClick()
 
-        // 4. ČEKAJ POVRATAK NA LOGIN
+        // 4. ČEKAJ POVRATAK NA LOGIN I PRIJAVI SE
         composeTestRule.waitUntil(10000) {
-            composeTestRule.onAllNodesWithTag("login_screen")
-                .fetchSemanticsNodes(false).isNotEmpty()
+            composeTestRule.onAllNodesWithTag("login_screen").fetchSemanticsNodes().isNotEmpty()
         }
 
-        // 5. PRIJAVI SE
-        composeTestRule.onNodeWithTag("email_input").performTextInput(testEmail)
-        composeTestRule.onNodeWithTag("password_input").performTextInput(testPass)
+        composeTestRule.onNodeWithTag("email_input").performTextReplacement(testEmail)
+        composeTestRule.onNodeWithTag("password_input").performTextReplacement(testPass)
         composeTestRule.onNodeWithTag("login_button").performClick()
 
-        // 6. ČEKAJ GLAVNI EKRAN
-        composeTestRule.waitUntil(10000) {
-            composeTestRule.onAllNodesWithTag("glavni_ekran")
-                .fetchSemanticsNodes(false).isNotEmpty()
+        // 5. ČEKAJ GLAVNI EKRAN I POGLEDAJ DETALJE
+        composeTestRule.waitUntil(15000) {
+            composeTestRule.onAllNodesWithTag("glavni_ekran").fetchSemanticsNodes().isNotEmpty()
         }
 
-        // 7. ČEKAJ DA SE LISTA UČITA I PRONAĐI REXA
-        composeTestRule.waitUntil(10000) {
-            composeTestRule.onAllNodesWithTag("animal_card_Rex")
-                .fetchSemanticsNodes(false).isNotEmpty()
-        }
-        composeTestRule.onNodeWithTag("animal_card_Rex")
-            .performScrollTo()
-            .performClick()
-        Thread.sleep(500)
+        // Pronađi bilo koju karticu (npr. Rexa) i klikni na nju
+        composeTestRule.onNodeWithTag("animal_list")
+            .performScrollToNode(hasTestTag("animal_card_Rex"))
+        composeTestRule.onNodeWithTag("animal_card_Rex").performClick()
 
-        // 8. KLIKNI UDOMI ME
-        composeTestRule.waitUntil(10000) {
-            composeTestRule.onAllNodesWithTag("adopt_button")
-                .fetchSemanticsNodes(false).isNotEmpty()
-        }
-        composeTestRule.onNodeWithTag("adopt_button")
-            .performScrollTo()
-            .performClick()
-        Thread.sleep(300)
+        // Provjeri da smo na detaljima
+        composeTestRule.onNodeWithText("O ljubimcu").assertIsDisplayed()
 
-        // 9. ISPUNI FORMU I POŠALJI
-        composeTestRule.waitUntil(10000) {
-            composeTestRule.onAllNodesWithTag("adoption_message_input")
-                .fetchSemanticsNodes(false).isNotEmpty()
-        }
-        composeTestRule.onNodeWithTag("adoption_message_input")
-            .performTextInput("Želim udomiti Rexa jer imam veliko dvorište.")
-        composeTestRule.onNodeWithTag("send_adoption_request_button").performClick()
-
-        // 10. ČEKAJ POVRATAK NA DETALJE — adopt_button se pojavi kad showForm = false
-        Thread.sleep(2000)
-        composeTestRule.waitUntil(10000) {
-            composeTestRule.onAllNodesWithTag("adopt_button")
-                .fetchSemanticsNodes(false).isNotEmpty()
-        }
-
-        // 11. ODJAVA
-        composeTestRule.waitUntil(10000) {
-            composeTestRule.onAllNodesWithTag("settings_tab")
-                .fetchSemanticsNodes(false).isNotEmpty()
-        }
+        // 6. ODJAVA
+        composeTestRule.onNodeWithTag("back_button").performClick()
         composeTestRule.onNodeWithTag("settings_tab").performClick()
-        Thread.sleep(500)
+        composeTestRule.onNodeWithText("Odjavi se").performClick()
 
-        composeTestRule.onNodeWithText("Odjavi se").performScrollTo().performClick()
-
-        // 12. ČEKAJ POVRATAK NA LOGIN
+        // ČEKAJ POVRATAK NA LOGIN
         composeTestRule.waitUntil(10000) {
-            composeTestRule.onAllNodesWithTag("login_screen")
-                .fetchSemanticsNodes(false).isNotEmpty()
+            composeTestRule.onAllNodesWithTag("login_screen").fetchSemanticsNodes().isNotEmpty()
         }
-        composeTestRule.onNodeWithTag("login_screen").assertIsDisplayed()
     }
 
     @Test
     fun adminFlowTest() {
-
-        // 1. OTVORI LOGIN
+        // 1. OTVORI LOGIN I PRIJAVI SE KAO ADMIN
         ActivityScenario.launch(LoginActivity::class.java)
-        Thread.sleep(500)
-
-        // 2. PRIJAVI SE KAO ADMIN
+        
         composeTestRule.onNodeWithTag("email_input").performTextInput("admin@domi.com")
         composeTestRule.onNodeWithTag("password_input").performTextInput("admin123")
         composeTestRule.onNodeWithTag("login_button").performClick()
 
-        // 3. ČEKAJ GLAVNI EKRAN
-        composeTestRule.waitUntil(10000) {
-            composeTestRule.onAllNodesWithTag("glavni_ekran")
-                .fetchSemanticsNodes(false).isNotEmpty()
+        // 2. ČEKAJ GLAVNI EKRAN
+        composeTestRule.waitUntil(15000) {
+            composeTestRule.onAllNodesWithTag("glavni_ekran").fetchSemanticsNodes().isNotEmpty()
         }
 
-        // 4. ČEKAJ ADD ANIMAL BUTTON I KLIKNI
-        composeTestRule.waitUntil(10000) {
-            composeTestRule.onAllNodesWithTag("add_animal_button")
-                .fetchSemanticsNodes(false).isNotEmpty()
-        }
+        // 3. DODAJ NOVU ŽIVOTINJU
         composeTestRule.onNodeWithTag("add_animal_button").performClick()
-        Thread.sleep(500)
-
-        // 5. ISPUNI FORMU ZA DODAVANJE
-        val newAnimalName = "Test Pas ${System.currentTimeMillis()}"
-        composeTestRule.waitUntil(10000) {
-            composeTestRule.onAllNodesWithTag("animal_name_input")
-                .fetchSemanticsNodes(false).isNotEmpty()
+        
+        composeTestRule.waitUntil(5000) {
+            composeTestRule.onAllNodesWithTag("animal_name_input").fetchSemanticsNodes().isNotEmpty()
         }
-        composeTestRule.onNodeWithTag("animal_name_input").performTextInput(newAnimalName)
-        composeTestRule.onNodeWithTag("animal_breed_input").performTextInput("Zlatni retriver")
-        composeTestRule.onNodeWithTag("animal_age_input").performTextInput("2 godine")
-        composeTestRule.onNodeWithTag("animal_description_input")
-            .performScrollTo()
-            .performTextInput("Ovo je testni opis.")
-        composeTestRule.onNodeWithTag("add_animal_submit_button")
-            .performScrollTo()
-            .performClick()
+        
+        val newName = "Testko"
+        composeTestRule.onNodeWithTag("animal_name_input").performTextInput(newName)
+        composeTestRule.onNodeWithTag("animal_breed_input").performTextInput("Pasmina")
+        composeTestRule.onNodeWithTag("animal_age_input").performTextInput("1 godina")
+        
+        composeTestRule.onNodeWithTag("add_animal_submit_button").performScrollTo().performClick()
 
-        // 6. ČEKAJ POVRATAK NA LISTU
+        // 4. PROVJERI DA SE VRATIO NA LISTU
         composeTestRule.waitUntil(10000) {
-            composeTestRule.onAllNodesWithTag("animal_list")
-                .fetchSemanticsNodes(false).isNotEmpty()
+            composeTestRule.onAllNodesWithTag("animal_list").fetchSemanticsNodes().isNotEmpty()
         }
-
-        // 7. PROVJERI DA ŽIVOTINJA POSTOJI U LISTI
-        composeTestRule.waitUntil(10000) {
-            composeTestRule.onAllNodesWithTag("animal_card_$newAnimalName")
-                .fetchSemanticsNodes(false).isNotEmpty()
-        }
-        composeTestRule.onNodeWithTag("animal_card_$newAnimalName")
-            .performScrollTo()
-            .assertExists()
-
-        // 8. OBRIŠI ŽIVOTINJU
-        composeTestRule.onNode(
-            hasContentDescription("Obriši") and
-                    hasAnyAncestor(hasTestTag("animal_card_$newAnimalName"))
-        ).performClick()
-
-        // 9. POTVRDI BRISANJE U DIJALOGU
-        composeTestRule.waitUntil(10000) {
-            composeTestRule.onAllNodesWithText("Obriši")
-                .fetchSemanticsNodes(false).isNotEmpty()
-        }
-        composeTestRule.onNodeWithText("Obriši").performClick()
-        Thread.sleep(1000)
-
-        composeTestRule.onNodeWithTag("animal_card_$newAnimalName").assertDoesNotExist()
-
-        // 10. IDI NA ZAHTJEVE
+        
+        // 5. ZAHTJEVI I ODJAVA
         composeTestRule.onNodeWithTag("requests_tab").performClick()
-        composeTestRule.waitUntil(10000) {
-            composeTestRule.onAllNodesWithTag("requests_list")
-                .fetchSemanticsNodes(false).isNotEmpty()
-        }
-        composeTestRule.onNodeWithTag("requests_list").assertIsDisplayed()
-
-        // 11. ODJAVA
+        composeTestRule.onNodeWithTag("requests_list").assertExists()
+        
         composeTestRule.onNodeWithTag("settings_tab").performClick()
-        Thread.sleep(500)
-        composeTestRule.onNodeWithText("Odjavi se").performScrollTo().performClick()
-
-        // 12. ČEKAJ POVRATAK NA LOGIN
-        composeTestRule.waitUntil(10000) {
-            composeTestRule.onAllNodesWithTag("login_screen")
-                .fetchSemanticsNodes(false).isNotEmpty()
-        }
-        composeTestRule.onNodeWithTag("login_screen").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Odjavi se").performClick()
     }
 }

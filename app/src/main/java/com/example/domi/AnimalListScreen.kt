@@ -179,23 +179,13 @@ fun AnimalListScreen(
                 Text(text = "Nema rezultata za odabrane filtere.", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         } else {
-            LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            LazyColumn(modifier = Modifier.fillMaxSize().testTag("animal_list"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 items(filtered, key = { it.id }) { animal ->
-                    Box {
-                        AnimalCard(animal) { onAnimalClick(animal) }
-                        if (isAdmin) {
-                            IconButton(
-                                onClick = { animalToDeleteId = animal.id },
-                                modifier = Modifier
-                                    .align(Alignment.TopEnd)
-                                    .padding(4.dp)
-                                    .background(MaterialTheme.colorScheme.errorContainer, CircleShape)
-                                    .size(32.dp)
-                            ) {
-                                Icon(imageVector = Icons.Default.Delete, contentDescription = "Obriši", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(20.dp))
-                            }
-                        }
-                    }
+                    AnimalCard(
+                        animal = animal,
+                        onDelete = if (isAdmin) { { animalToDeleteId = animal.id } } else null,
+                        onClick = { onAnimalClick(animal) }
+                    )
                 }
             }
         }
@@ -254,23 +244,37 @@ fun FilterDropdown(label: String, options: List<String>, selected: String, tag: 
 }
 
 @Composable
-fun AnimalCard(animal: Animal, onClick: () -> Unit) {
+fun AnimalCard(animal: Animal, onDelete: (() -> Unit)? = null, onClick: () -> Unit) {
     Card(modifier = Modifier.fillMaxWidth().clickable { onClick() }.testTag("animal_card_${animal.name}"), shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer), elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)) {
-        Row(modifier = Modifier.padding(12.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = Modifier.size(80.dp).clip(RoundedCornerShape(8.dp)).background(MaterialTheme.colorScheme.surfaceVariant), contentAlignment = Alignment.Center) {
-                if (animal.imageUri != null) {
-                    AsyncImage(model = animal.imageUri, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-                } else {
-                    animal.imageRes?.let {
-                        Image(painter = painterResource(id = it), contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Row(modifier = Modifier.padding(12.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Box(modifier = Modifier.size(80.dp).clip(RoundedCornerShape(8.dp)).background(MaterialTheme.colorScheme.surfaceVariant), contentAlignment = Alignment.Center) {
+                    if (animal.imageUri != null) {
+                        AsyncImage(model = animal.imageUri, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                    } else {
+                        animal.imageRes?.let {
+                            Image(painter = painterResource(id = it), contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                        }
                     }
                 }
+                Spacer(modifier = Modifier.width(16.dp))
+                Column {
+                    Text(text = animal.name, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text(text = animal.breed, fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(text = "${animal.gender}, ${animal.age}", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text(text = animal.name, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                Text(text = animal.breed, fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(text = "${animal.gender}, ${animal.age}", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (onDelete != null) {
+                IconButton(
+                    onClick = onDelete,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(4.dp)
+                        .background(MaterialTheme.colorScheme.errorContainer, CircleShape)
+                        .size(32.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Obriši", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(20.dp))
+                }
             }
         }
     }
