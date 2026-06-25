@@ -101,7 +101,7 @@ fun LoginScreen() {
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = FontFamily.Serif,
-                    color = Color.Black
+                    color = Color.Black,
                 )
 
                 Text(
@@ -200,6 +200,7 @@ fun LoginScreen() {
                         val intent = Intent(context, RegisterActivity::class.java)
                         context.startActivity(intent)
                     },
+                    modifier = Modifier.testTag("goto_register_button")
                 ) {
                     Text("Nemaš račun? Registriraj se")
                 }

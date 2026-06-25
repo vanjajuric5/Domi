@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -45,8 +46,7 @@ class RegisterActivity : ComponentActivity() {
             DomiTheme {
                 RegisterScreen(
                     onRegistrationSuccess = { finish() },
-                    onBack = { finish() }
-                )
+                ) { finish() }
             }
         }
     }
@@ -54,12 +54,11 @@ class RegisterActivity : ComponentActivity() {
 
 @Composable
 fun RegisterScreen(onRegistrationSuccess: () -> Unit, onBack: () -> Unit) {
-    var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    var city by remember { mutableStateOf("") }
-    var experience by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf(value = "") }
+    var email by remember { mutableStateOf(value = "") }
+    var password by remember { mutableStateOf(value = "") }
+    var phone by remember { mutableStateOf(value = "") }
+    var city by remember { mutableStateOf(value = "") }
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -71,19 +70,20 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit, onBack: () -> Unit) {
                 .fillMaxSize()
                 .padding(padding)
                 .padding(26.dp)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .testTag("register_screen"),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
-            Text("Registracija", fontSize = 32.sp, fontWeight = FontWeight.Bold)
+            Text(text = "Registracija", fontSize = 32.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(24.dp))
 
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
                 label = { Text("Ime i prezime") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                modifier = Modifier.fillMaxWidth().testTag("reg_name_input"),
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -91,8 +91,8 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit, onBack: () -> Unit) {
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                modifier = Modifier.fillMaxWidth().testTag("reg_email_input"),
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -101,8 +101,8 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit, onBack: () -> Unit) {
                 onValueChange = { password = it },
                 label = { Text("Lozinka") },
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                modifier = Modifier.fillMaxWidth().testTag("reg_password_input"),
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -110,8 +110,8 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit, onBack: () -> Unit) {
                 value = phone,
                 onValueChange = { phone = it },
                 label = { Text("Broj mobitela") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                modifier = Modifier.fillMaxWidth().testTag("reg_phone_input"),
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -119,17 +119,17 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit, onBack: () -> Unit) {
                 value = city,
                 onValueChange = { city = it },
                 label = { Text("Grad (Prebivalište)") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                modifier = Modifier.fillMaxWidth().testTag("reg_city_input"),
+                singleLine = true,
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             Button(
                 onClick = {
                     if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
                         scope.launch {
                             val result = withContext(Dispatchers.IO) {
-                                dbHelper.registerUser(name, email, password, phone, city, experience)
+                                dbHelper.registerUser(name, email, password, phone, city)
                             }
                             if (result != -1L) {
                                 Toast.makeText(context, "Registracija uspješna!", Toast.LENGTH_SHORT).show()
@@ -142,15 +142,18 @@ fun RegisterScreen(onRegistrationSuccess: () -> Unit, onBack: () -> Unit) {
                         Toast.makeText(context, "Popunite obavezna polja (Ime, Email, Lozinka).", Toast.LENGTH_SHORT).show()
                     }
                 },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = RoundedCornerShape(12.dp)
+                modifier = Modifier.fillMaxWidth().height(56.dp).testTag("reg_button"),
+                shape = RoundedCornerShape(12.dp),
             ) {
                 Text("REGISTRIRAJ SE")
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            TextButton(onClick = onBack) {
+            TextButton(
+                onClick = onBack,
+                modifier = Modifier.testTag("reg_back_button"),
+            ) {
                 Text("Odustani")
             }
         }

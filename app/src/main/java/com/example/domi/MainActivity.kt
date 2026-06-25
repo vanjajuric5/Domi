@@ -122,7 +122,7 @@ fun MainScreen(
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_arrow_back),
                                     contentDescription = "Nazad",
-                                    modifier = Modifier.size(24.dp),
+                                    modifier = Modifier.size(24.dp).testTag("back_button"),
                                 )
                             }
                         }
@@ -188,6 +188,7 @@ fun BottomNavigationBar(navController: NavHostController, isAdmin: Boolean) {
         val currentRoute = navBackStackEntry?.destination?.route
         items.forEach { item ->
             NavigationBarItem(
+                modifier = Modifier.testTag("${item.route}_tab"),
                 icon = { Icon(item.icon, contentDescription = item.title) },
                 label = { Text(text = item.title) },
                 selected = currentRoute == item.route,

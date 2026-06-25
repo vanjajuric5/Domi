@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -61,13 +62,15 @@ fun AnimalDetailScreen(animal: Animal, isAdmin: Boolean, userName: String, userE
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
-                } else if (animal.imageRes != null) {
-                    Image(
-                        painter = painterResource(id = animal.imageRes),
-                        contentDescription = "Slika ljubimca",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
+                } else {
+                    animal.imageRes?.let {
+                        Image(
+                            painter = painterResource(id = it),
+                            contentDescription = "Slika ljubimca",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop,
+                        )
+                    }
                 }
                 
                 Row(
@@ -126,7 +129,7 @@ fun AnimalDetailScreen(animal: Animal, isAdmin: Boolean, userName: String, userE
                 Spacer(modifier = Modifier.height(32.dp))
                 Button(
                     onClick = { showForm = true },
-                    modifier = Modifier.fillMaxWidth().height(60.dp),
+                    modifier = Modifier.fillMaxWidth().height(60.dp).testTag("adopt_button"),
                     shape = RoundedCornerShape(16.dp)
                 ) { Text("UDOMI ME", fontSize = 18.sp, fontWeight = FontWeight.Bold) }
             }
@@ -157,7 +160,13 @@ fun AdoptionFormScreen(animalName: String, userName: String, userEmail: String, 
         Text("Obrazac za udomljavanje", fontSize = 24.sp, fontWeight = FontWeight.Bold)
         Text("Ljubimac: $animalName", fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
         Spacer(modifier = Modifier.height(24.dp))
-        OutlinedTextField(value = message, onValueChange = { message = it }, label = { Text("Zašto želite udomiti ovog ljubimca?") }, modifier = Modifier.fillMaxWidth(), minLines = 5)
+        OutlinedTextField(
+            value = message,
+            onValueChange = { message = it },
+            label = { Text("Zašto želite udomiti ovog ljubimca?") },
+            modifier = Modifier.fillMaxWidth().testTag("adopt_form_message"),
+            minLines = 5
+        )
         Spacer(modifier = Modifier.height(32.dp))
         Button(
             onClick = {
@@ -171,7 +180,7 @@ fun AdoptionFormScreen(animalName: String, userName: String, userEmail: String, 
                     }
                 }
             },
-            modifier = Modifier.fillMaxWidth().height(56.dp)
+            modifier = Modifier.fillMaxWidth().height(56.dp).testTag("send_request_button")
         ) { Text("POŠALJI ZAHTJEV") }
         TextButton(onClick = onBack) { Text("Odustani") }
     }

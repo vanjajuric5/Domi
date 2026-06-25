@@ -51,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -72,7 +73,7 @@ data class Animal(
     val imageRes: Int?,
     val shelterName: String = "Sklonište Dumovec",
     val imageUri: String? = null,
-    val type: String = "Pas"
+    val type: String = "Pas",
 )
 
 object AnimalRepository {
@@ -140,21 +141,23 @@ fun AnimalListScreen(
 
     val filtered = remember(animals, selShelter, selGender, selAge, selType, selVaccinated, selNeutered, selMicrochipped) {
         animals.filter { a ->
-            (selShelter == "Sve" || a.shelterName == selShelter) &&
-            (selGender == "Svi" || a.gender == selGender) &&
-            (selAge == "Sve" || a.ageCategory == selAge) &&
-            (selType == "Sve" || a.type == selType) &&
-            (selVaccinated == "Sve" || (selVaccinated == "Da" && a.isVaccinated) || (selVaccinated == "Ne" && !a.isVaccinated)) &&
-            (selNeutered == "Sve" || (selNeutered == "Da" && a.isNeutered) || (selNeutered == "Ne" && !a.isNeutered)) &&
-            (selMicrochipped == "Sve" || (selMicrochipped == "Da" && a.isMicrochipped) || (selMicrochipped == "Ne" && !a.isMicrochipped))
+            val matchShelter = selShelter == "Sve" || a.shelterName == selShelter
+            val matchGender = selGender == "Svi" || a.gender == selGender
+            val matchAge = selAge == "Sve" || a.ageCategory == selAge
+            val matchType = selType == "Sve" || a.type == selType
+            val matchVaccinated = selVaccinated == "Sve" || (selVaccinated == "Da" && a.isVaccinated) || (selVaccinated == "Ne" && !a.isVaccinated)
+            val matchNeutered = selNeutered == "Sve" || (selNeutered == "Da" && a.isNeutered) || (selNeutered == "Ne" && !a.isNeutered)
+            val matchMicrochipped = selMicrochipped == "Sve" || (selMicrochipped == "Da" && a.isMicrochipped) || (selMicrochipped == "Ne" && !a.isMicrochipped)
+            
+            matchShelter && matchGender && matchAge && matchType && matchVaccinated && matchNeutered && matchMicrochipped
         }
     }
 
     animalToDeleteId?.let { id ->
         AlertDialog(
             onDismissRequest = { animalToDeleteId = null },
-            title = { Text("Potvrda brisanja", fontWeight = FontWeight.Bold) },
-            text = { Text("Jeste li sigurni da želite trajno obrisati ovog ljubimca?") },
+            title = { Text(text = "Potvrda brisanja", fontWeight = FontWeight.Bold) },
+            text = { Text(text = "Jeste li sigurni da želite trajno obrisati ovog ljubimca?") },
             confirmButton = {
                 Button(
                     onClick = {
@@ -162,10 +165,10 @@ fun AnimalListScreen(
                         animalToDeleteId = null
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                ) { Text("Obriši") }
+                ) { Text(text = "Obriši") }
             },
             dismissButton = {
-                TextButton(onClick = { animalToDeleteId = null }) { Text("Odustani") }
+                TextButton(onClick = { animalToDeleteId = null }) { Text(text = "Odustani") }
             }
         )
     }
@@ -173,7 +176,7 @@ fun AnimalListScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         if (filtered.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Nema rezultata za odabrane filtere.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = "Nema rezultata za odabrane filtere.", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -189,7 +192,7 @@ fun AnimalListScreen(
                                     .background(MaterialTheme.colorScheme.errorContainer, CircleShape)
                                     .size(32.dp)
                             ) {
-                                Icon(Icons.Default.Delete, contentDescription = "Obriši", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(20.dp))
+                                Icon(imageVector = Icons.Default.Delete, contentDescription = "Obriši", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(20.dp))
                             }
                         }
                     }
@@ -198,30 +201,30 @@ fun AnimalListScreen(
         }
 
         FloatingActionButton(onClick = { showFilterSheet = true }, containerColor = MaterialTheme.colorScheme.primary, modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp)) {
-            Icon(Icons.Default.FilterList, contentDescription = "Filtriraj")
+            Icon(imageVector = Icons.Default.FilterList, contentDescription = "Filtriraj")
         }
     }
 
     if (showFilterSheet) {
         ModalBottomSheet(onDismissRequest = { showFilterSheet = false }) {
             Column(modifier = Modifier.padding(24.dp).fillMaxWidth().verticalScroll(rememberScrollState())) {
-                Text("Filtriraj ljubimce", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                Text(text = "Filtriraj ljubimce", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(16.dp))
-                FilterDropdown("Vrsta", listOf("Sve", "Pas", "Mačka"), selType) { selType = it }
+                FilterDropdown(label = "Vrsta", options = listOf("Sve", "Pas", "Mačka"), selected = selType, tag = "filter_vrsta") { selType = it }
                 Spacer(modifier = Modifier.height(12.dp))
-                FilterDropdown("Sklonište", listOf("Sve", "Sklonište Dumovec", "Azil Prijatelji Čakovec", "Sklonište za pse Osijek", "Sklonište za životinje Rijeka", "Azil Šapa Slavonski Brod", "Sklonište Žarkovica Dubrovnik"), selShelter) { selShelter = it }
+                FilterDropdown(label = "Sklonište", options = listOf("Sve", "Sklonište Dumovec", "Azil Prijatelji Čakovec", "Sklonište za pse Osijek", "Sklonište za životinje Rijeka", "Azil Šapa Slavonski Brod", "Sklonište Žarkovica Dubrovnik"), selected = selShelter, tag = "filter_skloniste") { selShelter = it }
                 Spacer(modifier = Modifier.height(12.dp))
-                FilterDropdown("Spol", listOf("Svi", "Muški", "Ženski"), selGender) { selGender = it }
+                FilterDropdown(label = "Spol", options = listOf("Svi", "Muški", "Ženski"), selected = selGender, tag = "filter_spol") { selGender = it }
                 Spacer(modifier = Modifier.height(12.dp))
-                FilterDropdown("Dob", listOf("Sve", "Mladunče", "Adolescent", "Odrasli", "Senior"), selAge) { selAge = it }
+                FilterDropdown(label = "Dob", options = listOf("Sve", "Mladunče", "Adolescent", "Odrasli", "Senior"), selected = selAge, tag = "filter_dob") { selAge = it }
                 Spacer(modifier = Modifier.height(12.dp))
-                FilterDropdown("Cijepljen/a", listOf("Sve", "Da", "Ne"), selVaccinated) { selVaccinated = it }
+                FilterDropdown(label = "Cijepljen/a", options = listOf("Sve", "Da", "Ne"), selected = selVaccinated, tag = "filter_cijepljen") { selVaccinated = it }
                 Spacer(modifier = Modifier.height(12.dp))
-                FilterDropdown("Kastriran/a", listOf("Sve", "Da", "Ne"), selNeutered) { selNeutered = it }
+                FilterDropdown(label = "Kastriran/a", options = listOf("Sve", "Da", "Ne"), selected = selNeutered, tag = "filter_kastriran") { selNeutered = it }
                 Spacer(modifier = Modifier.height(12.dp))
-                FilterDropdown("Čipiran/a", listOf("Sve", "Da", "Ne"), selMicrochipped) { selMicrochipped = it }
+                FilterDropdown(label = "Čipiran/a", options = listOf("Sve", "Da", "Ne"), selected = selMicrochipped, tag = "filter_cipiran") { selMicrochipped = it }
                 Spacer(modifier = Modifier.height(24.dp))
-                Button(onClick = { selShelter = "Sve"; selGender = "Svi"; selAge = "Sve"; selType = "Sve"; selVaccinated = "Sve"; selNeutered = "Sve"; selMicrochipped = "Sve" }, modifier = Modifier.fillMaxWidth()) { Text("PONIŠTI FILTERE") }
+                Button(onClick = { selShelter = "Sve"; selGender = "Svi"; selAge = "Sve"; selType = "Sve"; selVaccinated = "Sve"; selNeutered = "Sve"; selMicrochipped = "Sve" }, modifier = Modifier.fillMaxWidth()) { Text(text = "PONIŠTI FILTERE") }
                 Spacer(modifier = Modifier.height(32.dp))
             }
         }
@@ -230,32 +233,37 @@ fun AnimalListScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FilterDropdown(label: String, options: List<String>, selected: String, onSelected: (String) -> Unit) {
+fun FilterDropdown(label: String, options: List<String>, selected: String, tag: String = "", onSelected: (String) -> Unit) {
     var expanded by remember { mutableStateOf(value = false) }
     ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
         OutlinedTextField(
             value = selected,
             onValueChange = {},
             readOnly = true,
-            label = { Text(label) },
+            label = { Text(text = label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true).fillMaxWidth()
+            modifier = Modifier
+                .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true)
+                .fillMaxWidth()
+                .testTag(tag)
         )
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            options.forEach { option -> DropdownMenuItem(text = { Text(option) }, onClick = { onSelected(option); expanded = false }) }
+            options.forEach { option -> DropdownMenuItem(text = { Text(text = option) }, onClick = { onSelected(option); expanded = false }) }
         }
     }
 }
 
 @Composable
 fun AnimalCard(animal: Animal, onClick: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth().clickable { onClick() }, shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer), elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)) {
+    Card(modifier = Modifier.fillMaxWidth().clickable { onClick() }.testTag("animal_card_${animal.name}"), shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer), elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)) {
         Row(modifier = Modifier.padding(12.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = Modifier.size(80.dp).clip(RoundedCornerShape(8.dp)).background(MaterialTheme.colorScheme.surfaceVariant), contentAlignment = Alignment.Center) {
                 if (animal.imageUri != null) {
                     AsyncImage(model = animal.imageUri, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-                } else if (animal.imageRes != null) {
-                    Image(painter = painterResource(id = animal.imageRes), contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                } else {
+                    animal.imageRes?.let {
+                        Image(painter = painterResource(id = it), contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                    }
                 }
             }
             Spacer(modifier = Modifier.width(16.dp))
