@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -69,7 +70,7 @@ fun AddAnimalScreen(onBack: () -> Unit, onAnimalAdded: () -> Unit) {
         TextButton(onClick = { launcher.launch("image/*") }) { Text(if (selectedImageUri == null) "Odaberi sliku" else "Promijeni sliku") }
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Ime ljubimca") }, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Ime ljubimca") }, modifier = Modifier.fillMaxWidth().testTag("animal_name_input"))
         Spacer(modifier = Modifier.height(12.dp))
 
         ExposedDropdownMenuBox(expanded = typeExp, onExpandedChange = { typeExp = !typeExp }, modifier = Modifier.fillMaxWidth()) {
@@ -80,10 +81,10 @@ fun AddAnimalScreen(onBack: () -> Unit, onAnimalAdded: () -> Unit) {
         }
         Spacer(modifier = Modifier.height(12.dp))
 
-        OutlinedTextField(value = breed, onValueChange = { breed = it }, label = { Text("Pasmina") }, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(value = breed, onValueChange = { breed = it }, label = { Text("Pasmina") }, modifier = Modifier.fillMaxWidth().testTag("animal_breed_input"))
         Spacer(modifier = Modifier.height(12.dp))
 
-        OutlinedTextField(value = exactAge, onValueChange = { exactAge = it }, label = { Text("Stvarna dob (npr. 8 godina)") }, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(value = exactAge, onValueChange = { exactAge = it }, label = { Text("Stvarna dob (npr. 8 godina)") }, modifier = Modifier.fillMaxWidth().testTag("animal_age_input"))
         Spacer(modifier = Modifier.height(12.dp))
 
         ExposedDropdownMenuBox(expanded = ageExp, onExpandedChange = { ageExp = !ageExp }, modifier = Modifier.fillMaxWidth()) {
@@ -120,7 +121,7 @@ fun AddAnimalScreen(onBack: () -> Unit, onAnimalAdded: () -> Unit) {
         }
         
         Spacer(modifier = Modifier.height(12.dp))
-        OutlinedTextField(value = description, onValueChange = { description = it }, label = { Text("O ljubimcu") }, modifier = Modifier.fillMaxWidth(), minLines = 4)
+        OutlinedTextField(value = description, onValueChange = { description = it }, label = { Text("O ljubimcu") }, modifier = Modifier.fillMaxWidth().testTag("animal_description_input"), minLines = 4)
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
@@ -145,6 +146,12 @@ fun AddAnimalScreen(onBack: () -> Unit, onAnimalAdded: () -> Unit) {
                                 imageUri = selectedImageUri?.toString()
                             )
                         }
+                        withContext(Dispatchers.Main) {  // ← ovo mora biti
+                            if (result != -1L) {
+                                Toast.makeText(context, "Ljubimac dodan!", Toast.LENGTH_SHORT).show()
+                                onAnimalAdded()
+                            }
+                        }
                         if (result != -1L) {
                             Toast.makeText(context, "Ljubimac dodan!", Toast.LENGTH_SHORT).show()
                             onAnimalAdded()
@@ -154,7 +161,7 @@ fun AddAnimalScreen(onBack: () -> Unit, onAnimalAdded: () -> Unit) {
                     Toast.makeText(context, "Ime je obavezno.", Toast.LENGTH_SHORT).show()
                 }
             },
-            modifier = Modifier.fillMaxWidth().height(56.dp),
+            modifier = Modifier.fillMaxWidth().height(56.dp).testTag("add_animal_submit_button"),
             shape = RoundedCornerShape(12.dp)
         ) { Text("DODAJ LJUBIMCA") }
         TextButton(onClick = onBack) { Text("Odustani") }

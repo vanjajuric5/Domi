@@ -133,8 +133,9 @@ fun MainScreen(
                                 onClick = { 
                                     navController.navigate("add_animal")
                                 },
+                                modifier = Modifier.testTag("add_animal_button")
                             ) {
-                                Icon(Icons.Default.Add, contentDescription = "Dodaj životinu")
+                                Icon(Icons.Default.Add, contentDescription = "Dodaj životinju")
                             }
                         }
                         Text(
@@ -192,6 +193,15 @@ fun BottomNavigationBar(navController: NavHostController, isAdmin: Boolean) {
                 icon = { Icon(item.icon, contentDescription = item.title) },
                 label = { Text(text = item.title) },
                 selected = currentRoute == item.route,
+                modifier = Modifier
+                    .testTag(
+                        when (item.route) {
+                            "settings" -> "settings_tab"
+                            "requests" -> "requests_tab"
+                            "pets" -> "pets_tab"
+                            else -> item.route
+                        }
+                    ),
                 onClick = {
                     navController.navigate(item.route) {
                         navController.graph.startDestinationRoute?.let { popUpTo(it) { saveState = true } }
